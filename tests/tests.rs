@@ -1,4 +1,4 @@
-use lazy_struct_diff::LazyDiff;
+use struct_diff_iter::LazyDiff;
 
 #[derive(PartialEq, LazyDiff, Clone)]
 struct SimpleStruct {
@@ -38,7 +38,7 @@ fn test_basic_struct() {
     };
     let mut other = dt.clone();
     other.field2 = 3;
-    let result: Vec<_> = dt.lazy_diff_iter(&other).collect();
+    let result: Vec<_> = dt.struct_diff_iter(&other).collect();
     assert_eq!(result.len(), 1);
     let diff = &result[0];
     assert_eq!(format!("{:?}", diff.field), "field2");
@@ -60,7 +60,7 @@ fn test_inner_struct() {
     other.field1.field2 = 3;
     other.field2.1 = 3;
     other.field3 = MyEnum::Three { field: 2 };
-    let diff: Vec<_> = dt.lazy_diff_iter(&other).collect();
+    let diff: Vec<_> = dt.struct_diff_iter(&other).collect();
     assert_eq!(format!("{:?}", diff[0].field), "field1.field2");
     assert_eq!(format!("{:?}", diff[1].field), "field2.1");
     assert_eq!(format!("{:?}", diff[2].field), "field3.Three.field");

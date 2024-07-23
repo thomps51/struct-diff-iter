@@ -1,20 +1,16 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Write};
 
 use smallvec::SmallVec;
 
+// Represents a field that was not equal within a struct/enum.
 pub struct DiffData<'a, 'b> {
     pub field: FieldIdentifier,
     pub self_value: &'a dyn Debug,
     pub other_value: &'b dyn Debug,
 }
 
-impl<'a, 'b> DiffData<'a, 'b> {
-    pub fn push_field(mut self, field: &'static str) -> Self {
-        self.field.push(field);
-        self
-    }
-}
-
+// Represents the name of a field within a struct/enum.
+// Such as field1, or field1.inner_field.inner_inner_field
 pub struct FieldIdentifier {
     storage: SmallVec<[&'static str; 4]>,
 }
@@ -31,10 +27,26 @@ impl FieldIdentifier {
     }
 }
 
+impl ToString for FieldIdentifier {
+    fn to_string(&self) -> String {
+        let len = self.storage.iter().fold(0, |s, x| s + x.len());
+        let mut result = String::with_capacity(len + self.storage.len() - 1);
+        let mut delimiter = "";
+        // stored in reverse order
+        for field in self.storage.iter().rev() {
+            result.write_str(&delimiter).unwrap();
+            delimiter = ".";
+            result.write_str(*field).unwrap();
+        }
+        result
+    }
+}
+
 impl Debug for FieldIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // print as field.field.field
         let mut delimiter = "";
+        // stored in reverse order
         for field in self.storage.iter().rev() {
             f.write_str(&delimiter)?;
             delimiter = ".";
@@ -45,12 +57,12 @@ impl Debug for FieldIdentifier {
 }
 
 pub trait LazyDiff {
-    fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData>;
+    fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData>;
 }
 
 // Impl for primatives
 impl LazyDiff for u64 {
-    fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData> {
+    fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData> {
         let is_eq = self == other;
         [DiffData {
             field: FieldIdentifier::new(),

@@ -17,7 +17,7 @@ fn impl_data_struct(name: &Ident, data_struct: &DataStruct) -> TokenStream {
             let gen = quote! {
                 #[automatically_derived]
                 impl LazyDiff for #name {
-                    fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = ::struct_diff_iter::DiffData> {
+                    fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = ::struct_diff_iter::DiffData> {
                         [].into_iter()
                     }
                 }
@@ -34,11 +34,11 @@ fn impl_data_struct(name: &Ident, data_struct: &DataStruct) -> TokenStream {
         let field_name_str = field_name.to_string();
         if i == 0 {
             quote! {
-                self.#field_name.lazy_diff_iter(&other.#field_name).update(|x| x.field.push(#field_name_str))
+                self.#field_name.struct_diff_iter(&other.#field_name).update(|x| x.field.push(#field_name_str))
             }
         } else {
             quote! {
-                .chain(self.#field_name.lazy_diff_iter(&other.#field_name).update(|x| x.field.push(#field_name_str)))
+                .chain(self.#field_name.struct_diff_iter(&other.#field_name).update(|x| x.field.push(#field_name_str)))
             }
         }
     });
@@ -46,7 +46,7 @@ fn impl_data_struct(name: &Ident, data_struct: &DataStruct) -> TokenStream {
     let gen = quote! {
         #[automatically_derived]
         impl LazyDiff for #name {
-            fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = ::struct_diff_iter::DiffData> {
+            fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = ::struct_diff_iter::DiffData> {
                 use ::struct_diff_iter::itertools::Itertools;
                 #(#field_writes)*
             }
@@ -111,15 +111,18 @@ fn impl_enum(name: &Ident, variants: &Punctuated<Variant, Comma>) -> TokenStream
                     let field_name_str = format!("{}.{}", variant_name.to_string(), field_name.to_string());
                     let iters = if i == 0 {
                         quote! {
-                            #self_field_name.lazy_diff_iter(&#other_field_name).update(|x| x.field.push(#field_name_str))
+                            #self_field_name.struct_diff_iter(&#other_field_name).update(|x| x.field.push(#field_name_str))
                         }
                     } else {
                         quote! {
-                            .chain(#self_field_name.lazy_diff_iter(&#other_field_name).update(|mut x| x.field.push(#field_name_str)))
+                            .chain(#self_field_name.struct_diff_iter(&#other_field_name).update(|mut x| x.field.push(#field_name_str)))
                         }
                     };
                     iters
                 });
+                // Since each leg of this match will be a different type, we need to Box up the iterator here.
+                // An alternative would be to if let every combination, but that seems silly to give up that much
+                // performance for a single allocation.
                 if let Fields::Named(_) = variant.fields {
                     quote! {
                         (#name::#variant_name{#(#self_field_names,)*}, #name::#variant_name{#(#other_field_names,)*}) => {
@@ -143,7 +146,7 @@ fn impl_enum(name: &Ident, variants: &Punctuated<Variant, Comma>) -> TokenStream
     let gen = quote! {
         #[automatically_derived]
         impl LazyDiff for #name {
-            fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = ::struct_diff_iter::DiffData> {
+            fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = ::struct_diff_iter::DiffData> {
                 use ::struct_diff_iter::itertools::Itertools;
                 let iter: Box<dyn Iterator<Item = ::struct_diff_iter::DiffData>> = match (self, other) {
                     #(#variants)*

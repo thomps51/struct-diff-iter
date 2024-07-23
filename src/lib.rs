@@ -1,4 +1,5 @@
 pub use itertools;
+use itertools::Itertools;
 pub use struct_diff_iter_derive::LazyDiff;
 pub use struct_diff_iter_internal::DiffData;
 pub use struct_diff_iter_internal::FieldIdentifier;
@@ -15,7 +16,7 @@ enum MyEnum {
 }
 
 impl LazyDiff for MyEnum {
-    fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData> {
+    fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData> {
         // Since each leg of this match will be a different type, we need to Box up the iterator here.
         // An alternative would be to if let every combination, but that seems silly to give up that much
         // performance for a single allocation.
@@ -26,19 +27,19 @@ impl LazyDiff for MyEnum {
                 use itertools::Itertools;
                 Box::new(
                     self_field
-                        .lazy_diff_iter(other_field)
+                        .struct_diff_iter(other_field)
                         .update(|x| x.field.push("Three.field")),
                 )
             }
             (MyEnum::Four(self_field0, self_field1), MyEnum::Four(other_field0, other_field1)) => {
                 Box::new(
                     self_field0
-                        .lazy_diff_iter(other_field0)
-                        .map(|x| x.push_field("Three.0"))
+                        .struct_diff_iter(other_field0)
+                        .update(|x| x.field.push("Three.0"))
                         .chain(
                             self_field1
-                                .lazy_diff_iter(other_field1)
-                                .map(|x| x.push_field("Three.1")),
+                                .struct_diff_iter(other_field1)
+                                .update(|x| x.field.push("Three.1")),
                         ),
                 )
             }
@@ -69,8 +70,8 @@ struct MyOuterType {
 // Ugly impl that will be generated
 
 impl LazyDiff for MyOuterType {
-    fn lazy_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData> {
-        self.field1.lazy_diff_iter(&other.field1).map(|mut x| {
+    fn struct_diff_iter<'a, 'b: 'a>(&'a self, other: &'b Self) -> impl Iterator<Item = DiffData> {
+        self.field1.struct_diff_iter(&other.field1).map(|mut x| {
             x.field.push("field1");
             x
         })
