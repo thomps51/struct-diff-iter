@@ -1,5 +1,5 @@
 [package]
-name = "lazy-struct-diff"
+name = "struct-diff-iter"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,5 @@ edition = "2021"
 const_format = "0.2.32"
 smallvec = "1.13.2"
 itertools = "0.13.0"
-lazy-struct-diff-derive = { path = "lazy-struct-diff-derive" }
-lazy-struct-diff-internal = { path = "lazy-struct-diff-internal"}  
+struct-diff-iter-derive = { path = "struct-diff-iter-derive" }
+struct-diff-iter-internal = { path = "struct-diff-iter-internal"}  

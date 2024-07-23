@@ -1,8 +1,8 @@
 pub use itertools;
-pub use lazy_struct_diff_derive::LazyDiff;
-pub use lazy_struct_diff_internal::DiffData;
-pub use lazy_struct_diff_internal::FieldIdentifier;
-pub use lazy_struct_diff_internal::LazyDiff;
+pub use struct_diff_iter_derive::LazyDiff;
+pub use struct_diff_iter_internal::DiffData;
+pub use struct_diff_iter_internal::FieldIdentifier;
+pub use struct_diff_iter_internal::LazyDiff;
 
 use std::fmt::Debug;
 

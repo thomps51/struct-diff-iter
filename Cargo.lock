@@ -38,34 +38,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy-struct-diff"
-version = "0.1.0"
-dependencies = [
- "const_format",
- "itertools",
- "lazy-struct-diff-derive",
- "lazy-struct-diff-internal",
- "smallvec",
-]
-
-[[package]]
-name = "lazy-struct-diff-derive"
-version = "0.1.0"
-dependencies = [
- "lazy-struct-diff-internal",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "lazy-struct-diff-internal"
-version = "0.1.0"
-dependencies = [
- "smallvec",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -88,6 +60,34 @@ name = "smallvec"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
+
+[[package]]
+name = "struct-diff-iter"
+version = "0.1.0"
+dependencies = [
+ "const_format",
+ "itertools",
+ "smallvec",
+ "struct-diff-iter-derive",
+ "struct-diff-iter-internal",
+]
+
+[[package]]
+name = "struct-diff-iter-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "struct-diff-iter-internal",
+ "syn",
+]
+
+[[package]]
+name = "struct-diff-iter-internal"
+version = "0.1.0"
+dependencies = [
+ "smallvec",
+]
 
 [[package]]
 name = "syn"

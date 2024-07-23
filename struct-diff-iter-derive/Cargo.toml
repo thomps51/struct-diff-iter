@@ -1,0 +1,13 @@
+[package]
+name = "struct-diff-iter-derive"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0"
+quote = "1.0"
+proc-macro2 = "1.0.43"
+struct-diff-iter-internal = { path = "../struct-diff-iter-internal"}  

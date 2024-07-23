@@ -1,7 +1,0 @@
-[package]
-name = "lazy-struct-diff-internal"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-smallvec = "1.13.2"
