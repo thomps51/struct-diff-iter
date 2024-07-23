@@ -1,0 +1,11 @@
+[package]
+name = "lazy-struct-diff"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+const_format = "0.2.32"
+smallvec = "1.13.2"
+itertools = "0.13.0"
+lazy-struct-diff-derive = { path = "lazy-struct-diff-derive" }
+lazy-struct-diff-internal = { path = "lazy-struct-diff-internal"}  
